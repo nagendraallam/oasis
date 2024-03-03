@@ -13,9 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-   - name: Use Node.js and npm from nvm
+      - name: Use Node.js and npm from nvm
         run: |
-          echo "${{ secrets.AWS_PEM_FILE }}" > key.pem
-          chmod 400 key.pem
-          ssh -i key.pem -o StrictHostKeyChecking=no ec2-3-110-1-202.ap-south-1.compute.amazonaws.com 'bash deploy_script.sh'
+            echo "${{ secrets.AWS_PEM_FILE }}" > key.pem
+            chmod 400 key.pem
+            ssh -i key.pem -o StrictHostKeyChecking=no ec2-3-110-1-202.ap-south-1.compute.amazonaws.com 'bash deploy_script.sh'
         shell: bash
