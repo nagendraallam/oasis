@@ -13,15 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: us-east-1 # Replace with your region
+          ssh-private-key: ${{ secrets.AWS_PEM_FILE }}
 
-      - name: Deploy application
-        run: |
-          echo "${{ secrets.AWS_PEM_FILE }}" > key.pem
-          chmod 600 key.pem
-          ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-3-110-1-202.ap-south-1.compute.amazonaws.com 'bash deploy_script.sh'
+      - name: Run deploy script on EC2
+        run: ssh -o StrictHostKeyChecking=no ec2-user@ec2-3-110-1-202.ap-south-1.compute.amazonaws.com 'bash deploy_script.sh'
