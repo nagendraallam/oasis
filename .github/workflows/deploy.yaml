@@ -20,11 +20,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
           aws-region: us-east-1 # Replace with your region
 
-      - name: Set up SSH key
+      - name: Deploy application
         run: |
           echo "${{ secrets.PEM_FILE }}" > key.pem
           chmod 600 key.pem
-
-      - name: Deploy application
-        run: |
           ssh -o StrictHostKeyChecking=no -i key.pem ec2-user@ec2-3-110-1-202.ap-south-1.compute.amazonaws.com 'bash deploy_script.sh'
