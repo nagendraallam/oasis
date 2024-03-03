@@ -21,7 +21,9 @@ jobs:
           aws-region: us-east-1 # Replace with your region
 
       - name: Set up SSH key
-        run: echo "${{ secrets.PEM_FILE }}" > key.pem && chmod 600 key.pem
+        run: |
+          echo "${{ secrets.PEM_FILE }}" > key.pem
+          chmod 600 key.pem
 
       - name: Deploy application
         run: |
