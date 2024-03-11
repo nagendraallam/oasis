@@ -15,9 +15,9 @@ export default function Home() {
       console.log("connected");
     });
 
-    socket.on("refreshPlayers", (players: string[]) => {
-      if (players && players.length === 0) return;
-      setHoms(players);
+    socket.on("refreshPositions", (position) => {
+      console.log("refreshPosition", position);
+      setHoms(position);
     });
 
     return () => {
@@ -54,7 +54,7 @@ export default function Home() {
               return (
                 <Box
                   key={index}
-                  position={[Math.random() * 5, Math.random() * 5, 0]}
+                  position={[player.position.x, player.position.y, 0]}
                 />
               );
             })
