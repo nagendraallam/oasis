@@ -31,6 +31,14 @@ export default function Home() {
         setHoms((prev) => {
           return prev.map((player) => {
             if (player.id === socket.id) {
+              socket.emit("updatePosition", {
+                id: socket.id,
+                position: {
+                  x: player.position.x,
+                  y: player.position.y + 1,
+                },
+              });
+
               return {
                 ...player,
                 position: {
@@ -43,10 +51,18 @@ export default function Home() {
           });
         });
       }
+
       if (key === "s") {
         setHoms((prev) => {
           return prev.map((player) => {
             if (player.id === socket.id) {
+              socket.emit("updatePosition", {
+                id: socket.id,
+                position: {
+                  x: player.position.x,
+                  y: player.position.y - 1,
+                },
+              });
               return {
                 ...player,
                 position: {
@@ -63,6 +79,14 @@ export default function Home() {
         setHoms((prev) => {
           return prev.map((player) => {
             if (player.id === socket.id) {
+              socket.emit("updatePosition", {
+                id: socket.id,
+                position: {
+                  x: player.position.x - 1,
+                  y: player.position.y,
+                },
+              });
+
               return {
                 ...player,
                 position: {
@@ -79,6 +103,14 @@ export default function Home() {
         setHoms((prev) => {
           return prev.map((player) => {
             if (player.id === socket.id) {
+              socket.emit("updatePosition", {
+                id: socket.id,
+                position: {
+                  x: player.position.x + 1,
+                  y: player.position.y,
+                },
+              });
+
               return {
                 ...player,
                 position: {

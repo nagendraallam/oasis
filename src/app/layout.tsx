@@ -14,9 +14,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  console.log("checking nodemon")
-
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>
