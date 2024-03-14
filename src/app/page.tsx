@@ -7,9 +7,12 @@ import axios from "axios";
 
 export default function Home() {
   const [homs, setHoms] = useState([]);
+  const [myId, setMyId] = useState("");
 
   useEffect(() => {
     const socket = io();
+
+    setMyId(socket.id);
 
     socket.on("connect", () => {
       console.log("connected");
@@ -18,6 +21,76 @@ export default function Home() {
     socket.on("refreshPositions", (position) => {
       console.log("refreshPosition", position);
       setHoms(position);
+    });
+
+    // add a keyboard click listener for wasd
+    document.addEventListener("keydown", (event) => {
+      const key = event.key;
+      if (key === "w") {
+        // updated all positions by +1
+        setHoms((prev) => {
+          return prev.map((player) => {
+            if (player.id === socket.id) {
+              return {
+                ...player,
+                position: {
+                  x: player.position.x,
+                  y: player.position.y + 1,
+                },
+              };
+            }
+            return player;
+          });
+        });
+      }
+      if (key === "s") {
+        setHoms((prev) => {
+          return prev.map((player) => {
+            if (player.id === socket.id) {
+              return {
+                ...player,
+                position: {
+                  x: player.position.x,
+                  y: player.position.y - 1,
+                },
+              };
+            }
+            return player;
+          });
+        });
+      }
+      if (key === "a") {
+        setHoms((prev) => {
+          return prev.map((player) => {
+            if (player.id === socket.id) {
+              return {
+                ...player,
+                position: {
+                  x: player.position.x - 1,
+                  y: player.position.y,
+                },
+              };
+            }
+            return player;
+          });
+        });
+      }
+      if (key === "d") {
+        setHoms((prev) => {
+          return prev.map((player) => {
+            if (player.id === socket.id) {
+              return {
+                ...player,
+                position: {
+                  x: player.position.x + 1,
+                  y: player.position.y,
+                },
+              };
+            }
+            return player;
+          });
+        });
+      }
     });
 
     return () => {
