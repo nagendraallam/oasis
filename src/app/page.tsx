@@ -1,13 +1,16 @@
 "use client";
 
-import { Canvas, extend, useFrame } from "@react-three/fiber";
+import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import { SetStateAction, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 
 export default function Home() {
   const [homs, setHoms] = useState([]);
+  const [myPosition, setMyPosition] = useState({ x: 0, y: 0, z: 5 });
   const [myId, setMyId] = useState("");
+
+  const cameraRef = useRef();
 
   useEffect(() => {
     const socket = io();
@@ -39,6 +42,12 @@ export default function Home() {
                 },
               });
 
+              setMyPosition({
+                x: player.position.x,
+                y: player.position.y + 1,
+                z: 5,
+              });
+
               return {
                 ...player,
                 position: {
@@ -63,6 +72,13 @@ export default function Home() {
                   y: player.position.y - 1,
                 },
               });
+
+              setMyPosition({
+                x: player.position.x,
+                y: player.position.y - 1,
+                z: 5,
+              });
+
               return {
                 ...player,
                 position: {
@@ -85,6 +101,12 @@ export default function Home() {
                   x: player.position.x - 1,
                   y: player.position.y,
                 },
+              });
+
+              setMyPosition({
+                x: player.position.x - 1,
+                y: player.position.y,
+                z: 5,
               });
 
               return {
@@ -111,6 +133,12 @@ export default function Home() {
                 },
               });
 
+              setMyPosition({
+                x: player.position.x + 1,
+                y: player.position.y,
+                z: 5,
+              });
+
               return {
                 ...player,
                 position: {
@@ -131,18 +159,22 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    console.log("myPosition", myPosition);
+    console.log("cameraRef", cameraRef);
+    if (cameraRef.current) {
+      console.log("cameraRef.current", cameraRef.current);
+      cameraRef.current.position.set(myPosition.x, myPosition.y, myPosition.z);
+    }
+  }, [myPosition]);
+
   return (
     <div>
-      <Canvas
-        camera={{
-          position: [0, 0, 5],
-          fov: 75,
-          near: 0.1,
-          far: 1000,
-        }}
-        shadows={true}
-        id="game-canvas"
-      >
+      <Canvas id="game-canvas">
+        <Camera
+          ref={cameraRef}
+          position={[myPosition.x, myPosition.y, myPosition.z]}
+        />
         <ambientLight intensity={Math.PI / 2} />
         <spotLight
           position={[10, 10, 10]}
@@ -191,4 +223,16 @@ function Box(props) {
       <meshStandardMaterial color={hovered ? "hotpink" : "orange"} />
     </mesh>
   );
+}
+
+function Camera(props) {
+  const ref = useRef();
+  const { set } = useThree();
+
+  console.log(useThree(), "setDefaultCamera");
+  // Make the camera known to the system
+  useEffect(() => void set({ camera: ref.current }), []);
+  // Update it every frame
+  useFrame(() => ref.current.updateMatrixWorld());
+  return <perspectiveCamera ref={ref} {...props} />;
 }
