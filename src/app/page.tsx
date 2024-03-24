@@ -2,7 +2,7 @@
 
 import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import { SetStateAction, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import socket from "./socket.ts";
 import axios from "axios";
 
 export default function Home() {
@@ -12,30 +12,17 @@ export default function Home() {
 
   const cameraRef = useRef();
 
+  console.log(socket());
   useEffect(() => {
-    const socket = io();
-
-    setMyId(socket.id);
-
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-
-    socket.on("refreshPositions", (position) => {
-      console.log("refreshPosition", position);
-      setHoms(position);
-    });
-
-    // add a keyboard click listener for wasd
+       // add a keyboard click listener for wasd
     document.addEventListener("keydown", (event) => {
       const key = event.key;
       if (key === "w") {
-        // updated all positions by +1
         setHoms((prev) => {
           return prev.map((player) => {
-            if (player.id === socket.id) {
+            if (player.id === myId) {
               socket.emit("updatePosition", {
-                id: socket.id,
+                id: myId,
                 position: {
                   x: player.position.x,
                   y: player.position.y + 1,
@@ -64,9 +51,9 @@ export default function Home() {
       if (key === "s") {
         setHoms((prev) => {
           return prev.map((player) => {
-            if (player.id === socket.id) {
+            if (player.id === myId) {
               socket.emit("updatePosition", {
-                id: socket.id,
+                id: myId, 
                 position: {
                   x: player.position.x,
                   y: player.position.y - 1,
@@ -94,9 +81,9 @@ export default function Home() {
       if (key === "a") {
         setHoms((prev) => {
           return prev.map((player) => {
-            if (player.id === socket.id) {
+            if (player.id === myId) {
               socket.emit("updatePosition", {
-                id: socket.id,
+                id: myId,
                 position: {
                   x: player.position.x - 1,
                   y: player.position.y,
@@ -124,9 +111,9 @@ export default function Home() {
       if (key === "d") {
         setHoms((prev) => {
           return prev.map((player) => {
-            if (player.id === socket.id) {
+            if (player.id === myId) {
               socket.emit("updatePosition", {
-                id: socket.id,
+                id:myId, 
                 position: {
                   x: player.position.x + 1,
                   y: player.position.y,
@@ -153,23 +140,32 @@ export default function Home() {
       }
     });
 
-    return () => {
-      socket.emit("close", socket.id);
-      socket.disconnect();
-    };
   }, []);
 
   useEffect(() => {
-    console.log("myPosition", myPosition);
-    console.log("cameraRef", cameraRef);
+
+  console.log(myId);
+
     if (cameraRef.current) {
-      console.log("cameraRef.current", cameraRef.current);
       cameraRef.current.position.set(myPosition.x, myPosition.y, myPosition.z);
     }
   }, [myPosition]);
 
+  useEffect(()=>{
+      console.log(myId)
+    }, [myId])
+
   return (
     <div>
+
+      <div className="fixed top-0 left-o text-white">
+      userdata : 
+      {myPosition && JSON.stringify(myPosition)}
+      my id : 
+      {myId && myId.toString()}
+      {homs && homs.length}
+      </div>
+
       <Canvas id="game-canvas">
         <Camera
           ref={cameraRef}
@@ -229,7 +225,6 @@ function Camera(props) {
   const ref = useRef();
   const { set } = useThree();
 
-  console.log(useThree(), "setDefaultCamera");
   // Make the camera known to the system
   useEffect(() => void set({ camera: ref.current }), []);
   // Update it every frame
