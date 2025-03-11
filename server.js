@@ -12,12 +12,23 @@ const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-console.log(`starting server in ${process.env.NODE_ENV} mode`);
+console.log(`starting server in ${process.env.NODE_ENV || 'development'} mode`);
 
 app.prepare().then(() => {
   const server = express();
   const httpServer = http.createServer(server);
-  const io = new Server(httpServer);
+  
+  // Create socket.io server with proper configuration
+  const io = new Server(httpServer, {
+    cors: {
+      origin: process.env.CORS_ORIGIN || "*",
+      methods: ["GET", "POST"]
+    },
+    transports: ['websocket', 'polling'],
+    pingTimeout: 30000,
+    pingInterval: 25000,
+    maxHttpBufferSize: 1e6 // 1 MB
+  });
 
   socket(io);
 
