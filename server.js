@@ -24,6 +24,7 @@ app.prepare().then(() => {
       origin: process.env.CORS_ORIGIN || "*",
       methods: ["GET", "POST"]
     },
+    path: '/api/socket',
     transports: ['websocket', 'polling'],
     pingTimeout: 30000,
     pingInterval: 25000,
